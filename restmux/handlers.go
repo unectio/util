@@ -62,6 +62,11 @@ func (c *c)Handle(ctx context.Context, w http.ResponseWriter, r *http.Request) E
 		return c.e
 	}
 
+	e := c.c.Acc(ctx)
+	if e != nil {
+		return e;
+	}
+
 	switch r.Method {
 	case "GET":
 		return list(ctx, w, r, c.c)
@@ -114,6 +119,11 @@ func findObject(ctx context.Context, r *http.Request, c Collection) (Object, Err
 func (o *o)Handle(ctx context.Context, w http.ResponseWriter, r *http.Request) Error {
 	if o.e != nil {
 		return o.e
+	}
+
+	e := o.c.Acc(ctx)
+	if e != nil {
+		return e;
 	}
 
 	switch r.Method {
@@ -172,6 +182,11 @@ func (p *p)Handle(ctx context.Context, w http.ResponseWriter, r *http.Request) E
 		return p.e
 	}
 
+	e := p.c.Acc(ctx)
+	if e != nil {
+		return e;
+	}
+
 	switch r.Method {
 	case "GET":
 		return pget(ctx, w, r, p.o, p.p)
@@ -212,6 +227,11 @@ func act(ctx context.Context, w http.ResponseWriter, r *http.Request, o Object, 
 func (a *a)Handle(ctx context.Context, w http.ResponseWriter, r *http.Request) Error {
 	if a.e != nil {
 		return a.e
+	}
+
+	e := a.c.Acc(ctx)
+	if e != nil {
+		return e;
 	}
 
 	switch r.Method {

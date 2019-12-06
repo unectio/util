@@ -11,11 +11,6 @@ type c struct {
 }
 
 func C(ctx context.Context, x Collection) *c {
-	e := x.Acc(ctx)
-	if e != nil {
-		return &c{ e: e }
-	}
-
 	return &c{ c: x }
 }
 
@@ -56,7 +51,7 @@ func (o *o)P(x Property) *p {
 		return &p{ e: o.e }
 	}
 
-	return &p{ o: o.o, p: x }
+	return &p{ c: o.c, o: o.o, p: x }
 }
 
 func (o *o)A(x Action) *a {
@@ -64,7 +59,7 @@ func (o *o)A(x Action) *a {
 		return &a{ e: o.e }
 	}
 
-	return &a{ o: o.o, a: x }
+	return &a{ c: o.c, o: o.o, a: x }
 }
 
 func (o *o)Get() (Object, Error) {
@@ -72,12 +67,14 @@ func (o *o)Get() (Object, Error) {
 }
 
 type p struct {
+	c	Collection
 	o	Object
 	p	Property
 	e	Error
 }
 
 type a struct {
+	c	Collection
 	o	Object
 	a	Action
 	e	Error
