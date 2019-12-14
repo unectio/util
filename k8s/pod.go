@@ -17,6 +17,14 @@ type Pod struct {
 	DepDesc
 }
 
+func (p *Pod)URL(proto string) string {
+	if proto != "" {
+		proto += "://"
+	}
+
+	return proto + p.Addr + ":" + p.Port
+}
+
 const (
 	LabelType	= "langlet-type"
 	LabelLang	= "langlet-lang"

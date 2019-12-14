@@ -9,7 +9,7 @@ func (pod *Pod)Ping() error {
 		return nil
 	}
 
-	c, err := net.Dial("tcp", pod.Addr + ":" + pod.Port)
+	c, err := net.Dial("tcp", pod.URL(""))
 	if err == nil {
 		c.Close()
 	}
