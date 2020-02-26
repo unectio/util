@@ -6,6 +6,7 @@ import (
 	"errors"
 	"reflect"
 	"strings"
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -142,6 +143,10 @@ func (mc *MemCol)Update(q bson.M, u interface{}) error {
 	}
 
 	return notFound()
+}
+
+func (mc *MemCol)EnsureIndex(_ *mgo.Index) error {
+	return nil
 }
 
 func updateObj(o *memObj, u interface{}) (*memObj, error) {

@@ -1,6 +1,7 @@
 package mongo
 
 import (
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -21,6 +22,8 @@ type Collection interface {
 	RemoveId(id bson.ObjectId) error
 	RemoveAll(q bson.M) error
 	Insert(q interface{}) error
+
+	EnsureIndex(*mgo.Index) error
 }
 
 type Query interface {

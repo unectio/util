@@ -47,6 +47,10 @@ func (mc *MgoCollection)RemoveAll(q bson.M) error {
 	return err
 }
 
+func (mc *MgoCollection)EnsureIndex(idx *mgo.Index) error {
+	return mc.c.EnsureIndex(*idx)
+}
+
 func (mc *MgoCollection)Insert(q interface{}) error {
 	return mc.c.Insert(q)
 }
