@@ -290,7 +290,7 @@ func (q *MemQ)Sort(f string) Query {
 }
 
 func (q *MemQ)Count() (int, error) {
-	return -1, errors.New("Not implemented")
+	return len(q.mc.objs), nil
 }
 
 func (q *MemQ)One(out interface{}) error {

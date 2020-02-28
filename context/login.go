@@ -35,16 +35,32 @@ type LoginInfo interface {
 	Scope() string
 }
 
-type HttpLogin string
+type simpleLogin string
 
-func (sc HttpLogin)Scope() string {
-	return string(sc)
+func (sl simpleLogin)Scope() string { return string(sl) }
+
+type HttpLogin struct {
+	simpleLogin
 }
 
 func GetHttpLogin(r *http.Request) HttpLogin {
-	return HttpLogin(r.RemoteAddr)
+	return HttpLogin{
+		simpleLogin(r.RemoteAddr),
+	}
 }
 
 func GetHttpLogin2(r *http.Request, pfx string) HttpLogin {
-	return HttpLogin(pfx + ":" + r.RemoteAddr)
+	return HttpLogin{
+		simpleLogin(pfx + ":" + r.RemoteAddr),
+	}
+}
+
+type TestLogin struct {
+	simpleLogin
+}
+
+func GetTestLogin() TestLogin {
+	return TestLogin{
+		simpleLogin("test"),
+	}
 }
