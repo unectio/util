@@ -24,8 +24,7 @@ func (r *Router)RegisterURL(url string, res interface{}) error {
 func (r *Router)HandleURL(url string) (interface{}, map[string]string) {
 	debug("= URL [%s]\n", url)
 	path := strings.Split(url, "/")
-	params := make(map[string]string)
-	return r.root.resolve_path(path, params), params
+	return r.root.resolve_path(path)
 }
 
 
@@ -83,26 +82,29 @@ func (lr *layer)register_path(path []string, res interface{}) error {
 	return next.register_path(path[1:], res)
 }
 
-func (lr *layer)resolve_path(path []string, params map[string]string) interface{} {
+func (lr *layer)resolve_path(path []string) (interface{}, map[string]string) {
 	debug("\t= PATH [%v]\n", path)
 	if len(path) == 0 {
-		return lr.match
+		return lr.match, nil
 	}
 
 	cur := path[0]
 
 	next, ok := lr.exact[cur]
 	if ok {
-		return next.resolve_path(path[1:], params)
+		return next.resolve_path(path[1:])
 	}
 
 	for pn, p := range lr.param {
-		res := p.resolve_path(path[1:], params)
+		res, params := p.resolve_path(path[1:])
 		if res != nil {
+			if params == nil {
+				params = make(map[string]string)
+			}
 			params[pn] = cur
-			return res
+			return res, params
 		}
 	}
 
-	return nil
+	return nil, nil
 }

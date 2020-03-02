@@ -49,37 +49,37 @@ func TestRouter(t *testing.T) {
 
 
 	res, p := r.HandleURL("foo")
-	if res != 1 {
+	if res != 1 || p != nil {
 		fmt.Printf("foo -> %v/%v\n", res, p)
 		t.Fail()
 	}
 
 	res, p = r.HandleURL("foo/FOO")
-	if res != 2 || p["id"] != "FOO" {
+	if res != 2 || p["id"] != "FOO" || len(p) != 1 {
 		fmt.Printf("foo/FOO -> %v/%v\n", res, p)
 		t.Fail()
 	}
 
 	res, p = r.HandleURL("foo/bar")
-	if res != 3 {
+	if res != 3 || p != nil {
 		fmt.Printf("foo/bar -> %v/%v\n", res, p)
 		t.Fail()
 	}
 
 	res, p = r.HandleURL("foo/FOO/bar")
-	if res != 4 || p["id"] != "FOO" {
+	if res != 4 || p["id"] != "FOO" || len(p) != 1 {
 		fmt.Printf("foo/FOO/bar -> %v/%v\n", res, p)
 		t.Fail()
 	}
 
 	res, p = r.HandleURL("foo/FOO/bar/BAR")
-	if res != 5 || p["id"] != "FOO" || p["id2"] != "BAR" {
+	if res != 5 || p["id"] != "FOO" || p["id2"] != "BAR" || len(p) != 2 {
 		fmt.Printf("foo/FOO/bar/BAR -> %v/%v\n", res, p)
 		t.Fail()
 	}
 
 	res, p = r.HandleURL("foo/FOO/BAR")
-	if res != 6 || p["id"] != "FOO" || p["id2"] != "BAR" {
+	if res != 6 || p["id"] != "FOO" || p["id2"] != "BAR" || len(p) != 2 {
 		fmt.Printf("foo/FOO/BAR -> %v/%v\n", res, p)
 		t.Fail()
 	}
