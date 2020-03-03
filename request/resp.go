@@ -73,6 +73,15 @@ func (r *Response)String() string {
 	}
 }
 
+func (r *Response)Hdrs() string {
+	ret := ""
+	for h, v := range r.resp.Header {
+		ret += fmt.Sprintf("%s=%s;", h, v)
+	}
+
+	return ret
+}
+
 func (r *Response)Error() string {
 	if r.OK() {
 		return ""
