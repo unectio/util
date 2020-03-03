@@ -36,6 +36,10 @@ func IsNotFound(err error) bool {
 	return err == mgo.ErrNotFound
 }
 
+func IsDup(err error) bool {
+	return mgo.IsDup(err)
+}
+
 func notFound() error {
 	return mgo.ErrNotFound
 }
