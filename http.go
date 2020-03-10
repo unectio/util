@@ -98,7 +98,7 @@ func QueryBody(r *http.Request) (string, []byte) {
 			case "application/json":
 				body, err := ioutil.ReadAll(r.Body)
 				if err == nil && len(body) > 0 {
-					return aux[1], body
+					return aux[0], body
 				}
 		}
 	}
