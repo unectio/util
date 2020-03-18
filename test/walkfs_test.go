@@ -37,6 +37,10 @@ func makeRoot() *TestEntry {
 func buildTree(ent os.FileInfo, dir util.DEntry) util.DEntry {
 	e := TestEntry{}
 	if ent.IsDir() {
+		if ent.Name() == ".git" {
+			return nil
+		}
+
 		e.Type = "dir"
 	} else {
 		e.Type = "file"
@@ -84,6 +88,10 @@ func TestWalkList(t *testing.T) {
 	root := makeRoot()
 	list := []*TestEntry{}
 	err := util.WalkTree("..", root, func(e os.FileInfo, d util.DEntry) util.DEntry {
+			if e.Name() == ".git" {
+				return nil
+			}
+
 			ent, f := buildList(e, d)
 			if f {
 				list = append(list, ent)
