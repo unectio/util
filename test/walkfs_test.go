@@ -63,7 +63,7 @@ func buildList(ent os.FileInfo, dir util.DEntry) (*TestEntry, bool) {
 
 func (e *TestEntry)Path() string { return e.SPath }
 
-func TestWalkfd(t *testing.T) {
+func TestWalkTree(t *testing.T) {
 	root := makeRoot()
 	err := util.WalkTree(".", root, buildTree)
 	if err != nil {
@@ -78,10 +78,12 @@ func TestWalkfd(t *testing.T) {
 	}
 
 	fmt.Printf("TREE:====================\n%s\n", string(d))
+}
 
-	root = makeRoot()
+func TestWalkList(t *testing.T) {
+	root := makeRoot()
 	list := []*TestEntry{}
-	err = util.WalkTree(".", root, func(e os.FileInfo, d util.DEntry) util.DEntry {
+	err := util.WalkTree(".", root, func(e os.FileInfo, d util.DEntry) util.DEntry {
 			ent, f := buildList(e, d)
 			if f {
 				list = append(list, ent)
@@ -93,7 +95,7 @@ func TestWalkfd(t *testing.T) {
 		return
 	}
 
-	d, err = json.MarshalIndent(list, "", "    ")
+	d, err := json.MarshalIndent(list, "", "    ")
 	if err != nil {
 		fmt.Printf("Error mashalling tree: %s\n", err.Error())
 		return
