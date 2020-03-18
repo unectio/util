@@ -65,7 +65,7 @@ func (e *TestEntry)Path() string { return e.SPath }
 
 func TestWalkTree(t *testing.T) {
 	root := makeRoot()
-	err := util.WalkTree(".", root, buildTree)
+	err := util.WalkTree("..", root, buildTree)
 	if err != nil {
 		fmt.Printf("Error build tree: %s\n", err.Error())
 		return
@@ -83,7 +83,7 @@ func TestWalkTree(t *testing.T) {
 func TestWalkList(t *testing.T) {
 	root := makeRoot()
 	list := []*TestEntry{}
-	err := util.WalkTree(".", root, func(e os.FileInfo, d util.DEntry) util.DEntry {
+	err := util.WalkTree("..", root, func(e os.FileInfo, d util.DEntry) util.DEntry {
 			ent, f := buildList(e, d)
 			if f {
 				list = append(list, ent)
