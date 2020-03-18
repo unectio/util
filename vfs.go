@@ -29,7 +29,9 @@ package util
 
 import (
 	"os"
+	"fmt"
 	"sync"
+	"errors"
 	"syscall"
 	"strings"
 	"io/ioutil"
@@ -156,4 +158,40 @@ func DU(dir string) (uint64, error) {
         })
 
         return bytes, err
+}
+
+func open_with_real_path(path string) (*os.File, string, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, "", err
+	}
+
+	real_path, err := os.Readlink(fmt.Sprintf("/proc/self/fd/%d", f.Fd()))
+	if err != nil {
+		f.Close()
+		return nil, "", err
+	}
+
+	return f, real_path, nil
+}
+
+func OpenSafe(dir, name string) (*os.File, error) {
+	f, r_path, err := open_with_real_path(dir)
+	if err != nil {
+		return nil, err
+	}
+
+	f.Close()
+
+	f, f_path, err := open_with_real_path(dir + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+
+	if !strings.HasPrefix(f_path, r_path) {
+		f.Close()
+		return nil, errors.New("target file is not in its directory")
+	}
+
+	return f, nil
 }
