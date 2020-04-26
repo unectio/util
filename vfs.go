@@ -28,14 +28,14 @@
 package util
 
 import (
-	"os"
-	"fmt"
-	"sync"
 	"errors"
-	"syscall"
-	"strings"
+	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
+	"strings"
+	"sync"
+	"syscall"
 )
 
 func Exists(path string) (bool, error) {
@@ -143,8 +143,10 @@ func WalkTree(prefix string, root DEntry, fn func(os.FileInfo, DEntry) DEntry) e
 }
 
 func StraightPath(path string) bool {
-	return !strings.Contains("/" + path + "/", "/../")
+	return !strings.Contains("/"+path+"/", "/../")
 }
+
+/* TBD: move out of Windows-compilable stuff
 
 func DU(dir string) (uint64, error) {
         var bytes uint64
@@ -159,6 +161,7 @@ func DU(dir string) (uint64, error) {
 
         return bytes, err
 }
+*/
 
 func open_with_real_path(path string) (*os.File, string, error) {
 	f, err := os.Open(path)
