@@ -32,10 +32,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
+	//"path/filepath"
 	"strings"
 	"sync"
-	"syscall"
+	//"syscall"
 )
 
 func Exists(path string) (bool, error) {
