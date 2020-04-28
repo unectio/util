@@ -31,11 +31,9 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"os"
-	"path/filepath"
 	"strings"
+	"os"
 	"sync"
-	"syscall"
 )
 
 func Exists(path string) (bool, error) {
@@ -144,22 +142,6 @@ func WalkTree(prefix string, root DEntry, fn func(os.FileInfo, DEntry) DEntry) e
 
 func StraightPath(path string) bool {
 	return !strings.Contains("/"+path+"/", "/../")
-}
-
-/* TBD: move out of Windows-compilable stuff
- */
-func DU(dir string) (uint64, error) {
-	var bytes uint64
-
-	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if err == nil && path != dir {
-			st, _ := info.Sys().(*syscall.Stat_t)
-			bytes += uint64(st.Blocks << 9)
-		}
-		return err
-	})
-
-	return bytes, err
 }
 
 /* */
