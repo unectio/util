@@ -32,10 +32,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	//"path/filepath"
+	"path/filepath"
 	"strings"
 	"sync"
-	//"syscall"
+	"syscall"
 )
 
 func Exists(path string) (bool, error) {
@@ -147,21 +147,22 @@ func StraightPath(path string) bool {
 }
 
 /* TBD: move out of Windows-compilable stuff
-
+ */
 func DU(dir string) (uint64, error) {
-        var bytes uint64
+	var bytes uint64
 
-        err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-                if err == nil && path != dir {
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err == nil && path != dir {
 			st, _ := info.Sys().(*syscall.Stat_t)
 			bytes += uint64(st.Blocks << 9)
 		}
-                return err
-        })
+		return err
+	})
 
-        return bytes, err
+	return bytes, err
 }
-*/
+
+/* */
 
 func open_with_real_path(path string) (*os.File, string, error) {
 	f, err := os.Open(path)
