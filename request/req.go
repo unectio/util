@@ -36,6 +36,7 @@ import (
 	"github.com/unectio/util"
 	"io"
 	"net/http"
+	"runtime"
 	"time"
 )
 
@@ -121,18 +122,29 @@ func (rq *Request) Tmo(t time.Duration) *Request {
 
 func (rq *Request) Do() *Response {
 
-	client := &http.Client{}
+	var caCertPool *x509.CertPool
+	var err error
+
+	if runtime.GOOS != "windows" {
+		caCertPool, err = x509.SystemCertPool()
+		if err != nil {
+			return &Response{err: fmt.Errorf("Cannot load system certificates: %s", err.Error())}
+		}
+	} else {
+		//System certificates are not supported on windows in GO
+		caCertPool = x509.NewCertPool()
+	}
 
 	if rq.Certificate != "" {
-		caCertPool := x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM([]byte(rq.Certificate))
-		client = &http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{
-					RootCAs: caCertPool,
-				},
+	}
+
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				RootCAs: caCertPool,
 			},
-		}
+		},
 	}
 
 	if rq.Timeout != 0 {
