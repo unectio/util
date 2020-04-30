@@ -29,17 +29,17 @@ package rq
 
 import (
 	"fmt"
-	"net/http"
-	"io/ioutil"
 	"github.com/unectio/util"
+	"io/ioutil"
+	"net/http"
 )
 
 type Response struct {
-	resp	*http.Response
-	err	error
+	resp *http.Response
+	err  error
 }
 
-func (r *Response)Code() string {
+func (r *Response) Code() string {
 	if r.err == nil {
 		return "OK"
 	} else if r.resp != nil {
@@ -49,11 +49,11 @@ func (r *Response)Code() string {
 	}
 }
 
-func (r *Response)OK() bool {
+func (r *Response) OK() bool {
 	return r.err == nil
 }
 
-func (r *Response)E() error {
+func (r *Response) E() error {
 	if r.OK() {
 		return nil
 	} else {
@@ -61,7 +61,7 @@ func (r *Response)E() error {
 	}
 }
 
-func (r *Response)String() string {
+func (r *Response) String() string {
 	if r.OK() {
 		return fmt.Sprintf("OK %s", r.resp.Status)
 	} else {
@@ -73,8 +73,11 @@ func (r *Response)String() string {
 	}
 }
 
-func (r *Response)Hdrs() string {
+func (r *Response) Hdrs() string {
 	ret := ""
+	if r.resp == nil {
+		return ret
+	}
 	for h, v := range r.resp.Header {
 		ret += fmt.Sprintf("%s=%s;", h, v)
 	}
@@ -82,7 +85,7 @@ func (r *Response)Hdrs() string {
 	return ret
 }
 
-func (r *Response)Error() string {
+func (r *Response) Error() string {
 	if r.OK() {
 		return ""
 	}
@@ -98,7 +101,7 @@ func (r *Response)Error() string {
 	return fmt.Sprintf("Request failed: %s (response: %d/%s)", r.err.Error(), code, body)
 }
 
-func (r *Response)B(out interface{}) *Response {
+func (r *Response) B(out interface{}) *Response {
 	if r.OK() {
 		err := util.ReadJsonBody(r.resp.Body, out)
 		if err != nil {
@@ -108,7 +111,7 @@ func (r *Response)B(out interface{}) *Response {
 	return r
 }
 
-func (r *Response)Raw() (*Response, []byte) {
+func (r *Response) Raw() (*Response, []byte) {
 	var body []byte
 
 	if r.OK() {

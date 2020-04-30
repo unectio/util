@@ -40,17 +40,17 @@ import (
 )
 
 type Request struct {
-	Method  string
-	Host    string
-	Path    string
-	Headers map[string]string
-	Status  int
-	Body    interface{}
-	Timeout time.Duration
+	Method      string
+	Host        string
+	Path        string
+	Headers     map[string]string
+	Status      int
+	Body        interface{}
+	Timeout     time.Duration
+	Certificate string
 
-	sign        []byte
-	signH       string
-	certificate string
+	sign  []byte
+	signH string
 }
 
 func (rq *Request) URL() string {
@@ -123,9 +123,9 @@ func (rq *Request) Do() *Response {
 
 	client := &http.Client{}
 
-	if rq.certificate != "" {
+	if rq.Certificate != "" {
 		caCertPool := x509.NewCertPool()
-		caCertPool.AppendCertsFromPEM([]byte(rq.certificate))
+		caCertPool.AppendCertsFromPEM([]byte(rq.Certificate))
 		client = &http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
@@ -166,9 +166,9 @@ func (rq *Request) Do() *Response {
 
 	resp, err := client.Do(http_rq)
 	if err != nil {
+		fmt.Printf("\n test: %s \n", err.Error())
 		return &Response{err: fmt.Errorf("Cannot do http: %s", err.Error())}
 	}
-
 	if resp.StatusCode != rq.Status {
 		err = fmt.Errorf("Unexpected response: %d", resp.StatusCode)
 	}
