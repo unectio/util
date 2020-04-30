@@ -166,7 +166,6 @@ func (rq *Request) Do() *Response {
 
 	resp, err := client.Do(http_rq)
 	if err != nil {
-		fmt.Printf("\n test: %s \n", err.Error())
 		return &Response{err: fmt.Errorf("Cannot do http: %s", err.Error())}
 	}
 	if resp.StatusCode != rq.Status {
