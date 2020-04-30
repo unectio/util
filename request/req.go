@@ -28,59 +28,62 @@
 package rq
 
 import (
-	"io"
-	"fmt"
-	"time"
 	"bytes"
-	"net/http"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
+	"fmt"
 	"github.com/unectio/util"
+	"io"
+	"net/http"
+	"time"
 )
 
 type Request struct {
-	Method		string
-	Host		string
-	Path		string
-	Headers		map[string]string
-	Status		int
-	Body		interface{}
-	Timeout		time.Duration
+	Method  string
+	Host    string
+	Path    string
+	Headers map[string]string
+	Status  int
+	Body    interface{}
+	Timeout time.Duration
 
-	sign		[]byte
-	signH		string
+	sign        []byte
+	signH       string
+	certificate string
 }
 
-func (rq *Request)URL() string {
+func (rq *Request) URL() string {
 	return rq.Host + rq.Path
 }
 
 func Req(host, url string) *Request {
-	return &Request {
-		Host:		host,
-		Path:		url,
+	return &Request{
+		Host: host,
+		Path: url,
 
-		Method:		"POST",
-		Status:		http.StatusOK,
+		Method: "POST",
+		Status: http.StatusOK,
 	}
 }
 
-func (r *Request)Q(q string) *Request {
+func (r *Request) Q(q string) *Request {
 	r.Path += q
 	return r
 }
 
-func (r *Request)S(h string, key []byte) *Request {
+func (r *Request) S(h string, key []byte) *Request {
 	r.sign = key
 	r.signH = h
 	return r
 }
 
-func (r *Request)M(m string) *Request {
+func (r *Request) M(m string) *Request {
 	r.Method = m
 	return r
 }
 
-func (r *Request)H(k, v string) *Request {
+func (r *Request) H(k, v string) *Request {
 	if r.Headers == nil {
 		r.Headers = make(map[string]string)
 	}
@@ -88,21 +91,21 @@ func (r *Request)H(k, v string) *Request {
 	return r
 }
 
-func (r *Request)B(b interface{}) *Request {
+func (r *Request) B(b interface{}) *Request {
 	r.Body = b
 	return r
 }
 
-func (r *Request)OK(status int) *Request {
+func (r *Request) OK(status int) *Request {
 	r.Status = status
 	return r
 }
 
-func (rq *Request)String() string {
+func (rq *Request) String() string {
 	return fmt.Sprintf("%s:%s", rq.Method, rq.URL())
 }
 
-func (rq *Request)Hdrs() string {
+func (rq *Request) Hdrs() string {
 	ret := ""
 	for h, v := range rq.Headers {
 		ret += fmt.Sprintf("%s=%s;", h, v)
@@ -111,13 +114,26 @@ func (rq *Request)Hdrs() string {
 	return ret
 }
 
-func (rq *Request)Tmo(t time.Duration) *Request {
+func (rq *Request) Tmo(t time.Duration) *Request {
 	rq.Timeout = t
 	return rq
 }
 
-func (rq *Request)Do() *Response {
-	client := &http.Client{ }
+func (rq *Request) Do() *Response {
+
+	client := &http.Client{}
+
+	if rq.certificate != "" {
+		caCertPool := x509.NewCertPool()
+		caCertPool.AppendCertsFromPEM([]byte(rq.certificate))
+		client = &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					RootCAs: caCertPool,
+				},
+			},
+		}
+	}
 
 	if rq.Timeout != 0 {
 		client.Timeout = rq.Timeout
@@ -128,7 +144,7 @@ func (rq *Request)Do() *Response {
 	if rq.Body != nil {
 		data, err := json.Marshal(rq.Body)
 		if err != nil {
-			return &Response{ err: fmt.Errorf("Cannot marshal body: %s", err.Error()) }
+			return &Response{err: fmt.Errorf("Cannot marshal body: %s", err.Error())}
 		}
 
 		body = bytes.NewBuffer(data)
@@ -137,7 +153,7 @@ func (rq *Request)Do() *Response {
 
 	http_rq, err := http.NewRequest(rq.Method, rq.URL(), body)
 	if err != nil {
-		return &Response{ err: fmt.Errorf("Cannot make request: %s", err.Error()) }
+		return &Response{err: fmt.Errorf("Cannot make request: %s", err.Error())}
 	}
 
 	if rq.sign != nil {
@@ -150,12 +166,12 @@ func (rq *Request)Do() *Response {
 
 	resp, err := client.Do(http_rq)
 	if err != nil {
-		return &Response{ err: fmt.Errorf("Cannot do http: %s", err.Error()) }
+		return &Response{err: fmt.Errorf("Cannot do http: %s", err.Error())}
 	}
 
 	if resp.StatusCode != rq.Status {
 		err = fmt.Errorf("Unexpected response: %d", resp.StatusCode)
 	}
 
-	return &Response{ resp: resp, err: err }
+	return &Response{resp: resp, err: err}
 }
