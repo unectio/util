@@ -136,6 +136,8 @@ func (rq *Request) Do() *Response {
 	}
 
 	if rq.Certificate != "" {
+		//if user is using own certificate - we do not load system ones
+		caCertPool = x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM([]byte(rq.Certificate))
 	}
 
