@@ -40,6 +40,10 @@ import (
 	"time"
 )
 
+const (
+	sys_cert_pool string = "::SYS::"
+)
+
 type Request struct {
 	Method      string
 	Host        string
@@ -76,6 +80,10 @@ func (r *Request) Q(q string) *Request {
 func (r *Request) C(cert string) *Request {
 	r.Certificate = cert
 	return r
+}
+
+func (r *Request) SC() *Request {
+	return r.C(sys_cert_pool)
 }
 
 func (r *Request) S(h string, key []byte) *Request {
@@ -125,33 +133,43 @@ func (rq *Request) Tmo(t time.Duration) *Request {
 	return rq
 }
 
-func (rq *Request) Do() *Response {
-
-	var caCertPool *x509.CertPool
-	var err error
+func (rq *Request) make_cert_pool() (*x509.CertPool, error) {
+	if rq.Certificate != sys_cert_pool {
+		cert_pool := x509.NewCertPool()
+		cert_pool.AppendCertsFromPEM([]byte(rq.Certificate))
+		return cert_pool, nil
+	}
 
 	if runtime.GOOS != "windows" {
-		caCertPool, err = x509.SystemCertPool()
-		if err != nil {
-			return &Response{err: fmt.Errorf("Cannot load system certificates: %s", err.Error())}
-		}
+		return x509.SystemCertPool()
 	} else {
-		//System certificates are not supported on windows in GO
-		caCertPool = x509.NewCertPool()
+		return x509.NewCertPool(), nil
+	}
+}
+
+func (rq *Request) make_client() (*http.Client, error) {
+	if rq.Certificate == "" {
+		return &http.Client{}, nil
 	}
 
-	if rq.Certificate != "" {
-		//if user is using own certificate - we do not load system ones
-		caCertPool = x509.NewCertPool()
-		caCertPool.AppendCertsFromPEM([]byte(rq.Certificate))
+	cert_pool, err := rq.make_cert_pool()
+	if err != nil {
+		return nil, err
 	}
 
-	client := &http.Client{
+	return &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				RootCAs: caCertPool,
+				RootCAs: cert_pool,
 			},
 		},
+	}, nil
+}
+
+func (rq *Request) Do() *Response {
+	client, err := rq.make_client()
+	if err != nil {
+		return &Response{err: fmt.Errorf("Cannot make http client: %s", err.Error()) }
 	}
 
 	if rq.Timeout != 0 {
