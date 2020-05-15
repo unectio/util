@@ -73,6 +73,11 @@ func (r *Request) Q(q string) *Request {
 	return r
 }
 
+func (r *Request) C(cert string) *Request {
+	r.Certificate = cert
+	return r
+}
+
 func (r *Request) S(h string, key []byte) *Request {
 	r.sign = key
 	r.signH = h
