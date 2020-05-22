@@ -36,6 +36,7 @@ import (
 	"github.com/unectio/util"
 	"io"
 	"net/http"
+	"net/url"
 	"runtime"
 	"time"
 )
@@ -74,6 +75,16 @@ func Req(host, url string) *Request {
 
 func (r *Request) Q(q string) *Request {
 	r.Path += q
+	return r
+}
+
+func (r *Request) QA(args map[string]string) *Request {
+	q := url.Values{}
+	for k, v := range args {
+		q.Add(k, v)
+	}
+
+	r.Path += q.Encode()
 	return r
 }
 
