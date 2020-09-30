@@ -28,17 +28,18 @@
 package k8s
 
 import (
-	"errors"
 	"encoding/base64"
-	"k8s.io/client-go/rest"
+	"errors"
+
 	"github.com/unectio/util"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/api/extensions/v1beta1"
+	"k8s.io/api/apps/v1beta1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 )
 
 const (
-	InClusterConfig	=	"$incluster"
+	InClusterConfig = "$incluster"
 )
 
 type DepAPI interface {
@@ -54,18 +55,18 @@ type Client interface {
 }
 
 type KubeNsClient struct {
-	ns	string
-	c	*kubernetes.Clientset
+	ns string
+	c  *kubernetes.Clientset
 }
 
-func (kc *KubeNsClient)Deps() DepAPI {
-	return kc.c.Extensions().Deployments(kc.ns)
+func (kc *KubeNsClient) Deps() DepAPI {
+	return kc.c.AppsV1beta1().Deployments(kc.ns)
 }
 
 type SaConfig struct {
-	Host		string		`yaml:"host"`
-	Token		string		`yaml:"token"`
-	CaCert		string		`yaml:"ca_cert"`
+	Host   string `yaml:"host"`
+	Token  string `yaml:"token"`
+	CaCert string `yaml:"ca_cert"`
 }
 
 func Connect(cfg, ns string) (Client, error) {
@@ -92,9 +93,9 @@ func Connect(cfg, ns string) (Client, error) {
 		}
 
 		kconf = &rest.Config{
-			Host:			sacfg.Host,
-			BearerToken:		sacfg.Token,
-			TLSClientConfig:	rest.TLSClientConfig{CAData: cert},
+			Host:            sacfg.Host,
+			BearerToken:     sacfg.Token,
+			TLSClientConfig: rest.TLSClientConfig{CAData: cert},
 		}
 	}
 
