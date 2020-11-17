@@ -6,7 +6,7 @@ import (
 )
 
 type Router struct {
-	root	*layer
+	root *layer
 }
 
 func MakeRouter() *Router {
@@ -15,23 +15,22 @@ func MakeRouter() *Router {
 	return rt
 }
 
-func (r *Router)RegisterURL(url string, res interface{}) error {
+func (r *Router) RegisterURL(url string, res interface{}) error {
 	debug("+ URL [%s]\n", url)
 	path := strings.Split(url, "/")
 	return r.root.register_path(path, res)
 }
 
-func (r *Router)HandleURL(url string) (interface{}, map[string]string) {
+func (r *Router) HandleURL(url string) (interface{}, map[string]string) {
 	debug("= URL [%s]\n", url)
 	path := strings.Split(url, "/")
 	return r.root.resolve_path(path)
 }
 
-
 type layer struct {
-	exact	map[string]*layer
-	param	map[string]*layer
-	match	interface{}
+	exact map[string]*layer
+	param map[string]*layer
+	match interface{}
 }
 
 func new_layer() *layer {
@@ -43,7 +42,7 @@ func new_layer() *layer {
 
 func is_param(n string) (bool, string) {
 	if strings.HasPrefix(n, "{") && strings.HasSuffix(n, "}") {
-		return true , n[1:len(n)-1]
+		return true, n[1 : len(n)-1]
 	} else {
 		return false, ""
 	}
@@ -59,7 +58,7 @@ func next_layer(lrs map[string]*layer, name string) *layer {
 	return next
 }
 
-func (lr *layer)register_path(path []string, res interface{}) error {
+func (lr *layer) register_path(path []string, res interface{}) error {
 	debug("\t+ PATH [%v]\n", path)
 	if len(path) == 0 {
 		if lr.match != nil {
@@ -82,7 +81,7 @@ func (lr *layer)register_path(path []string, res interface{}) error {
 	return next.register_path(path[1:], res)
 }
 
-func (lr *layer)resolve_path(path []string) (interface{}, map[string]string) {
+func (lr *layer) resolve_path(path []string) (interface{}, map[string]string) {
 	debug("\t= PATH [%v]\n", path)
 	if len(path) == 0 {
 		return lr.match, nil

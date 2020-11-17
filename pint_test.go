@@ -7,21 +7,27 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-package main
+package util
 
 import (
-	"fmt"
 	"testing"
-	"strings"
-	"os/exec"
-	"github.com/unectio/util"
 )
 
-func TestReadCmdLines(t *testing.T) {
-	cmd := exec.Command("ls", ".")
-	l, err := util.ReadCmdLines(cmd)
-	if err != nil {
-		t.Fatal(err)
+func TestPint(t *testing.T) {
+	pint := PInt{}
+	pint.Inc()
+	pint.Inc()
+	pint.Inc()
+	if pint.Peak != 3 {
+		t.Fail()
 	}
-	fmt.Printf("%s\n", strings.Join(l, "\n"))
+	pint.Dec()
+	if pint.Peak != 3 {
+		t.Fail()
+	}
+	pint.Dec()
+	pint.Inc()
+	if pint.Peak != 3 {
+		t.Fail()
+	}
 }

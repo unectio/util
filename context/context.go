@@ -30,6 +30,7 @@ package context
 import (
 	"context"
 	"sync/atomic"
+
 	"github.com/unectio/util/mongo"
 	"go.uber.org/zap"
 )
@@ -38,11 +39,11 @@ var rover uint64
 
 type Context struct {
 	context.Context
-	S	mongo.Session
-	L	*zap.SugaredLogger
+	S mongo.Session
+	L *zap.SugaredLogger
 
-	rover	uint64
-	li	LoginInfo
+	rover uint64
+	li    LoginInfo
 }
 
 func Make(li LoginInfo) *Context {
@@ -54,11 +55,11 @@ func Make(li LoginInfo) *Context {
 }
 
 type forkedLogin struct {
-	from	LoginInfo
-	reason	string
+	from   LoginInfo
+	reason string
 }
 
-func (fl *forkedLogin)Scope() string {
+func (fl *forkedLogin) Scope() string {
 	return fl.from.Scope() + " (" + fl.reason + ")"
 }
 

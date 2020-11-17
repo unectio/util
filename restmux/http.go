@@ -28,10 +28,10 @@
 package restmux
 
 import (
-	"io"
 	"context"
-	"net/http"
 	"encoding/json"
+	"io"
+	"net/http"
 )
 
 func respondJson(ctx context.Context, w http.ResponseWriter, from interface{}) Error {

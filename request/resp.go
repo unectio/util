@@ -29,9 +29,10 @@ package rq
 
 import (
 	"fmt"
-	"github.com/unectio/util"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/unectio/util"
 )
 
 type Response struct {
@@ -68,7 +69,7 @@ func (r *Response) String() string {
 		if r.resp != nil {
 			return fmt.Sprintf("%s (status %s)", r.err.Error(), r.resp.Status)
 		} else {
-			return fmt.Sprintf("%s", r.err.Error())
+			return r.err.Error()
 		}
 	}
 }

@@ -5,7 +5,7 @@ import (
 )
 
 func debug_print(f string, args ...interface{}) {
-	fmt.Printf("ROUTER:" + f, args...)
+	fmt.Printf("ROUTER:"+f, args...)
 }
 
 var debug func(f string, args ...interface{})
@@ -14,12 +14,12 @@ func Debug() {
 	debug = debug_print
 }
 
-func (r *Router)Print() {
+func (r *Router) Print() {
 	fmt.Print("======\n")
 	r.root.print("\t")
 }
 
-func (l *layer)print(pfx string) {
+func (l *layer) print(pfx string) {
 	if l.match != nil {
 		fmt.Printf("%s=->%v\n", pfx, l.match)
 	}
@@ -32,4 +32,3 @@ func (l *layer)print(pfx string) {
 		n.print(pfx + "\t")
 	}
 }
-

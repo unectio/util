@@ -30,13 +30,14 @@ package mongo
 import (
 	"fmt"
 	"testing"
+
 	"gopkg.in/mgo.v2/bson"
 )
 
 type Foo struct {
-	Id	bson.ObjectId	`bson:"_id"`
-	A	int		`bson:"a"`
-	B	string		`bson:"b"`
+	Id bson.ObjectId `bson:"_id"`
+	A  int           `bson:"a"`
+	B  string        `bson:"b"`
 }
 
 func TestMemdb(t *testing.T) {
@@ -49,7 +50,9 @@ func TestMemdb(t *testing.T) {
 		t.FailNow()
 	}
 
-	col.Insert(&Foo{Id: bson.NewObjectId(), A: 2, B: "two"})
+	if err := col.Insert(&Foo{Id: bson.NewObjectId(), A: 2, B: "two"}); err != nil {
+		t.Fatalf("error insert: %s\n", err)
+	}
 
 	var x Foo
 

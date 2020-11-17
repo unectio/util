@@ -58,8 +58,8 @@ type Action interface {
 
 type Collection interface {
 	Acc(context.Context) Error
-	Find(context.Context, /* id */ string) (Object, Error)
-	Lookup(context.Context, /* name */ string, url.Values) (Object, Error)
+	Find(context.Context /* id */, string) (Object, Error)
+	Lookup(context.Context /* name */, string, url.Values) (Object, Error)
 	Add(context.Context, Image) (Object, Error)
 	Del(context.Context, Object) Error
 	Iter(context.Context, url.Values, func(context.Context, Object) Error) Error

@@ -40,14 +40,14 @@ func Debug() {
 
 func init() {
 
-	zcfg := zap.Config {
-		Level:			LogLevel,
-		Development:		true,
-		DisableStacktrace:	true,
-		Encoding:		"console",
-		EncoderConfig:		zap.NewDevelopmentEncoderConfig(),
-		OutputPaths:		[]string{"stderr"},
-		ErrorOutputPaths:	[]string{"stderr"},
+	zcfg := zap.Config{
+		Level:             LogLevel,
+		Development:       true,
+		DisableStacktrace: true,
+		Encoding:          "console",
+		EncoderConfig:     zap.NewDevelopmentEncoderConfig(),
+		OutputPaths:       []string{"stderr"},
+		ErrorOutputPaths:  []string{"stderr"},
 	}
 
 	logger, _ := zcfg.Build()

@@ -45,7 +45,7 @@ func notFound() error {
 }
 
 func IdQ(id string) bson.M {
-	return bson.M { "_id": bson.ObjectIdHex(id) }
+	return bson.M{"_id": bson.ObjectIdHex(id)}
 }
 
 func IdSafeQ(q bson.M, id string) bson.M {

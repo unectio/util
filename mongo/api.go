@@ -33,8 +33,8 @@ import (
 )
 
 type Location struct {
-	Db	string
-	Col	string
+	Db  string
+	Col string
 }
 
 type Session interface {

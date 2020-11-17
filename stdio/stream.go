@@ -33,14 +33,14 @@ import (
 )
 
 type Stream struct {
-	me	int
-	peer	int
+	me   int
+	peer int
 }
 
-func (s *Stream)Read() string {
+func (s *Stream) Read() string {
 	var ret string
 
-	b := make([]byte, 1024, 1024)
+	b := make([]byte, 1024)
 	for {
 		sz, _ := syscall.Read(s.me, b)
 		if sz <= 0 {
@@ -74,19 +74,19 @@ func Make(name string) (*Stream, error) {
 	return &ret, nil
 }
 
-func (s *Stream)PFd() string {
+func (s *Stream) PFd() string {
 	return strconv.Itoa(s.peer)
 }
 
-func (s *Stream)Close() {
+func (s *Stream) Close() {
 	syscall.Close(s.me)
 	syscall.Close(s.peer)
 }
 
-func (s *Stream)Fd() uintptr {
+func (s *Stream) Fd() uintptr {
 	return uintptr(s.me)
 }
 
-func (s *Stream)Pd() int {
+func (s *Stream) Pd() int {
 	return s.peer
 }

@@ -1,15 +1,14 @@
-package main
+package router
 
 import (
 	"fmt"
 	"testing"
-	"github.com/unectio/util/restmux/router"
 )
 
 func TestRouter(t *testing.T) {
-	r := router.MakeRouter()
+	r := MakeRouter()
 
-	router.Debug()
+	Debug()
 
 	if r.RegisterURL("foo", 1) != nil {
 		fmt.Printf("Name conflict foo")
@@ -46,7 +45,6 @@ func TestRouter(t *testing.T) {
 		t.FailNow()
 	}
 	r.Print()
-
 
 	res, p := r.HandleURL("foo")
 	if res != 1 || p != nil {

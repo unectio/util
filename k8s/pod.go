@@ -29,22 +29,23 @@ package k8s
 
 import (
 	"fmt"
+
 	"github.com/unectio/api"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 )
 
 type Pod struct {
-	UID	string
-	Addr	string
-	Port	string
-	Host	string
-	Helper	string
-	Token	string
+	UID    string
+	Addr   string
+	Port   string
+	Host   string
+	Helper string
+	Token  string
 
 	DepDesc
 }
 
-func (p *Pod)URL(proto string) string {
+func (p *Pod) URL(proto string) string {
 	if proto != "" {
 		proto += "://"
 	}
@@ -53,14 +54,14 @@ func (p *Pod)URL(proto string) string {
 }
 
 const (
-	LabelType	= "langlet-type"
-	LabelLang	= "langlet-lang"
+	LabelType = "langlet-type"
+	LabelLang = "langlet-lang"
 
-	LabelFunc	= "function"
-	LabelHelper	= "helper"
+	LabelFunc   = "function"
+	LabelHelper = "helper"
 )
 
-func (p *Pod)scanEnv(env []v1.EnvVar) {
+func (p *Pod) scanEnv(env []v1.EnvVar) {
 	for _, v := range env {
 		switch v.Name {
 		case api.EnvPort:
@@ -78,10 +79,10 @@ func (p *Pod)scanEnv(env []v1.EnvVar) {
 }
 
 func toPod(pod *v1.Pod) (*Pod, error) {
-	p := &Pod {
-		UID:		string(pod.ObjectMeta.UID),
-		Addr:		pod.Status.PodIP,
-		Host:		pod.Status.HostIP,
+	p := &Pod{
+		UID:  string(pod.ObjectMeta.UID),
+		Addr: pod.Status.PodIP,
+		Host: pod.Status.HostIP,
 	}
 
 	typ := pod.ObjectMeta.Labels[LabelType]
@@ -89,7 +90,7 @@ func toPod(pod *v1.Pod) (*Pod, error) {
 	case LabelHelper:
 		p.Helper = pod.ObjectMeta.Labels[LabelLang]
 	case LabelFunc:
-		; /* that's OK */
+		/* that's OK */
 	default:
 		return nil, fmt.Errorf("Non-langlet POD %s popped up", p.UID)
 	}
@@ -99,7 +100,7 @@ func toPod(pod *v1.Pod) (*Pod, error) {
 	}
 
 	if p.Helper != "" && p.Helper != p.lang {
-		return nil, fmt.Errorf("Lang mismatch: %s != %s", p.Helper, p.Lang)
+		return nil, fmt.Errorf("Lang mismatch: %s != %s", p.Helper, p.Lang())
 	}
 
 	return p, nil

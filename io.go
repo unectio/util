@@ -28,10 +28,10 @@
 package util
 
 import (
-	"io"
-	"os"
 	"bufio"
 	"errors"
+	"io"
+	"os"
 	"os/exec"
 )
 
@@ -46,7 +46,7 @@ func ReadCmdLines(cmd *exec.Cmd) ([]string, error) {
 		return nil, errors.New("cannot start cmd: " + err.Error())
 	}
 
-	defer cmd.Wait()
+	defer cmd.Wait() //nolint:errcheck
 
 	return ReadIOLines(stdout)
 }
@@ -75,7 +75,7 @@ func MakeReadCloser(r io.Reader) io.ReadCloser {
 	return &closerWrap{r}
 }
 
-func (closerWrap)Close() error {
+func (closerWrap) Close() error {
 	return nil
 }
 
@@ -85,7 +85,7 @@ func SaveFile(dir, file string, dirPerm os.FileMode, from io.Reader, filePerm os
 		return err
 	}
 
-	to, err := os.OpenFile(dir + "/" + file, os.O_WRONLY | os.O_CREATE | os.O_TRUNC, filePerm)
+	to, err := os.OpenFile(dir+"/"+file, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, filePerm)
 	if err != nil {
 		return err
 	}

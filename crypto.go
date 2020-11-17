@@ -28,15 +28,15 @@
 package util
 
 import (
-	"crypto/rand"
 	"crypto/hmac"
-	"encoding/hex"
+	"crypto/rand"
 	"crypto/sha256"
+	"encoding/hex"
 )
 
 func Sha256(s string) string {
 	hash := sha256.New()
-	hash.Write([]byte(s))
+	hash.Write([]byte(s)) //nolint:errcheck
 	return hex.EncodeToString(hash.Sum(nil))
 }
 
@@ -63,17 +63,16 @@ func RandomString(l int) (string, error) {
 
 	rs := make([]rune, l)
 	for i, j := range ri {
-		rs[i] = rsRunes[int(j) % len(rsRunes)]
+		rs[i] = rsRunes[int(j)%len(rsRunes)]
 	}
 
 	return string(rs), nil
 }
 
-
 func HashHMAC(sec []byte, data ...[]byte) string {
 	hash := hmac.New(sha256.New, sec)
 	for _, dat := range data {
-		hash.Write(dat)
+		hash.Write(dat) //nolint:errcheck
 	}
 	return hex.EncodeToString(hash.Sum(nil))
 }

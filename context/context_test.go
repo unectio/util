@@ -7,21 +7,20 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-package main
+package context
 
 import (
 	"testing"
-	"github.com/unectio/util/context"
 )
 
 func TestContextLog(t *testing.T) {
-	ctx := context.Make(context.Global("test"))
-	context.L(ctx).Infof("Hello, world!")
+	ctx := Make(Global("test"))
+	L(ctx).Infof("Hello, world!")
 }
 
 func TestContextFork(t *testing.T) {
-	ctx := context.Make(context.Global("test-fork"))
-	ctx2 := context.Fork(ctx, "test")
-	context.L(ctx).Infof("Hello, kid!")
-	context.L(ctx2).Infof("Hello, fork!")
+	ctx := Make(Global("test-fork"))
+	ctx2 := Fork(ctx, "test")
+	L(ctx).Infof("Hello, kid!")
+	L(ctx2).Infof("Hello, fork!")
 }

@@ -7,19 +7,18 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-package main
+package util
 
 import (
-	"time"
 	"errors"
 	"testing"
-	"github.com/unectio/util"
+	"time"
 )
 
 func TestCachedValue(t *testing.T) {
 	var called bool
 
-	cv := util.MakeCachedValue(func() (interface{}, error) {
+	cv := MakeCachedValue(func() (interface{}, error) {
 		if called {
 			return nil, errors.New("already")
 		}
@@ -44,17 +43,17 @@ func TestCachedValue(t *testing.T) {
 
 func TestInvalidate(t *testing.T) {
 	var called int
-	var cv *util.CachedValue
+	var cv *CachedValue
 
-	cv = util.MakeCachedValue(func() (interface{}, error) {
+	cv = MakeCachedValue(func() (interface{}, error) {
 		called++
-		time.AfterFunc(500 * time.Millisecond, func() { cv.Invalidate() })
+		time.AfterFunc(500*time.Millisecond, func() { cv.Invalidate() })
 		return "foo", nil
 	})
 
-	for i := 0; i < 3 ; i++ {
-		cv.Get()
-		cv.Get()
+	for i := 0; i < 3; i++ {
+		cv.Get() //nolint:errcheck
+		cv.Get() //nolint:errcheck
 		time.Sleep(time.Second)
 	}
 

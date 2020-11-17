@@ -37,7 +37,7 @@ type LoginInfo interface {
 
 type simpleLogin string
 
-func (sl simpleLogin)Scope() string { return string(sl) }
+func (sl simpleLogin) Scope() string { return string(sl) }
 
 type HttpLogin struct {
 	simpleLogin

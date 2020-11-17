@@ -7,17 +7,16 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-package main
+package workq
 
 import (
 	"fmt"
-	"time"
 	"sync"
 	"testing"
-	"github.com/unectio/util/workq"
+	"time"
 )
 
-func run(wq *workq.Pool, key, seq string, wg *sync.WaitGroup) {
+func run(wq *Pool, key, seq string, wg *sync.WaitGroup) {
 	wg.Add(1)
 	go func() {
 		wq.Run(key, func(w interface{}) {
@@ -31,7 +30,7 @@ func run(wq *workq.Pool, key, seq string, wg *sync.WaitGroup) {
 func TestWqueue(t *testing.T) {
 	var wg sync.WaitGroup
 
-	wq := workq.Make()
+	wq := Make()
 	wq.AddWorker("1")
 	wq.AddWorker("2")
 

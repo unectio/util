@@ -29,8 +29,9 @@ package restmux
 
 import (
 	"context"
-	"net/url"
 	"net/http"
+	"net/url"
+
 	"github.com/gorilla/mux"
 )
 
@@ -84,14 +85,14 @@ func create(ctx context.Context, w http.ResponseWriter, r *http.Request, c Colle
 	return respondJson2(ctx, w, http.StatusCreated, o.Info(ctx, nil, false))
 }
 
-func (c *c)Handle(ctx context.Context, w http.ResponseWriter, r *http.Request) Error {
+func (c *c) Handle(ctx context.Context, w http.ResponseWriter, r *http.Request) Error {
 	if c.e != nil {
 		return c.e
 	}
 
 	e := c.c.Acc(ctx)
 	if e != nil {
-		return e;
+		return e
 	}
 
 	switch r.Method {
@@ -104,7 +105,7 @@ func (c *c)Handle(ctx context.Context, w http.ResponseWriter, r *http.Request) E
 	return errBadm
 }
 
-var CMethods = []string{ "GET", "POST", "OPTIONS" }
+var CMethods = []string{"GET", "POST", "OPTIONS"}
 
 func info(ctx context.Context, w http.ResponseWriter, r *http.Request, o Object) Error {
 	return respondJson(ctx, w, o.Info(ctx, r.URL.Query(), true))
@@ -143,14 +144,14 @@ func findObject(ctx context.Context, r *http.Request, c Collection) (Object, Err
 	return o, err
 }
 
-func (o *o)Handle(ctx context.Context, w http.ResponseWriter, r *http.Request) Error {
+func (o *o) Handle(ctx context.Context, w http.ResponseWriter, r *http.Request) Error {
 	if o.e != nil {
 		return o.e
 	}
 
 	e := o.c.Acc(ctx)
 	if e != nil {
-		return e;
+		return e
 	}
 
 	switch r.Method {
@@ -165,7 +166,7 @@ func (o *o)Handle(ctx context.Context, w http.ResponseWriter, r *http.Request) E
 	return errBadm
 }
 
-var OMethods = []string{ "GET", "PUT", "DELETE", "OPTIONS" }
+var OMethods = []string{"GET", "PUT", "DELETE", "OPTIONS"}
 
 func pget(ctx context.Context, w http.ResponseWriter, r *http.Request, o Object, prop Property) Error {
 	i, err := prop.Get(ctx, o, r.URL.Query())
@@ -204,14 +205,14 @@ func pdel(ctx context.Context, w http.ResponseWriter, r *http.Request, o Object,
 	return nil
 }
 
-func (p *p)Handle(ctx context.Context, w http.ResponseWriter, r *http.Request) Error {
+func (p *p) Handle(ctx context.Context, w http.ResponseWriter, r *http.Request) Error {
 	if p.e != nil {
 		return p.e
 	}
 
 	e := p.c.Acc(ctx)
 	if e != nil {
-		return e;
+		return e
 	}
 
 	switch r.Method {
@@ -226,7 +227,7 @@ func (p *p)Handle(ctx context.Context, w http.ResponseWriter, r *http.Request) E
 	return errBadm
 }
 
-var PMethods = []string{ "GET", "PUT", "DELETE", "OPTIONS" }
+var PMethods = []string{"GET", "PUT", "DELETE", "OPTIONS"}
 
 func act(ctx context.Context, w http.ResponseWriter, r *http.Request, o Object, a Action) Error {
 	i := a.Image()
@@ -251,14 +252,14 @@ func act(ctx context.Context, w http.ResponseWriter, r *http.Request, o Object, 
 	return nil
 }
 
-func (a *a)Handle(ctx context.Context, w http.ResponseWriter, r *http.Request) Error {
+func (a *a) Handle(ctx context.Context, w http.ResponseWriter, r *http.Request) Error {
 	if a.e != nil {
 		return a.e
 	}
 
 	e := a.c.Acc(ctx)
 	if e != nil {
-		return e;
+		return e
 	}
 
 	switch r.Method {
@@ -269,4 +270,4 @@ func (a *a)Handle(ctx context.Context, w http.ResponseWriter, r *http.Request) E
 	return errBadm
 }
 
-var AMethods = []string{ "POST", "OPTIONS" }
+var AMethods = []string{"POST", "OPTIONS"}

@@ -7,18 +7,17 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-package main
+package util
 
 import (
 	"fmt"
-	"time"
 	"sync"
 	"testing"
-	"github.com/unectio/util"
+	"time"
 )
 
 func TestVcount(t *testing.T) {
-	vc := util.MakeVCount()
+	vc := MakeVCount()
 
 	vg := sync.WaitGroup{}
 	vg.Add(3)
@@ -64,6 +63,6 @@ func TestVcount(t *testing.T) {
 	}()
 
 	fmt.Printf("Test 'gone' thing\n")
-	vc.Add("b", util.VcDying)
+	vc.Add("b", VcDying)
 	vg.Wait()
 }

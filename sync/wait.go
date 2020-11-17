@@ -41,12 +41,12 @@ func CondWaitTmo(cond *sync.Cond, timeout time.Duration) {
 type Till time.Duration
 
 const (
-	TillMinute Till	= Till(time.Minute)
-	TillHour Till	= Till(time.Hour)
-	TillDay Till	= Till(24 * time.Hour)
+	TillMinute Till = Till(time.Minute)
+	TillHour   Till = Till(time.Hour)
+	TillDay    Till = Till(24 * time.Hour)
 )
 
-func (t Till)Sleep() {
+func (t Till) Sleep() {
 	var left time.Duration
 
 	now := time.Now()
@@ -59,16 +59,16 @@ type WaitGroupErr struct {
 	err error
 }
 
-func (wg *WaitGroupErr)Inc() {
+func (wg *WaitGroupErr) Inc() {
 	wg.WaitGroup.Add(1)
 }
 
-func (wg *WaitGroupErr)Wait() error {
+func (wg *WaitGroupErr) Wait() error {
 	wg.WaitGroup.Wait()
 	return wg.err
 }
 
-func (wg *WaitGroupErr)Done(err error) {
+func (wg *WaitGroupErr) Done(err error) {
 	wg.err = err
 	wg.WaitGroup.Done()
 }

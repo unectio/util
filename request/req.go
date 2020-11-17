@@ -33,12 +33,13 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
-	"github.com/unectio/util"
 	"io"
 	"net/http"
 	"net/url"
 	"runtime"
 	"time"
+
+	"github.com/unectio/util"
 )
 
 const (
@@ -180,7 +181,7 @@ func (rq *Request) make_client() (*http.Client, error) {
 func (rq *Request) Do() *Response {
 	client, err := rq.make_client()
 	if err != nil {
-		return &Response{err: fmt.Errorf("Cannot make http client: %s", err.Error()) }
+		return &Response{err: fmt.Errorf("Cannot make http client: %s", err.Error())}
 	}
 
 	if rq.Timeout != 0 {

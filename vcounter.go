@@ -28,26 +28,26 @@
 package util
 
 import (
+	"strconv"
 	"sync"
 	"time"
-	"strconv"
 )
 
 const (
-	VcDying	= "-1"
+	VcDying = "-1"
 )
 
 type VCount struct {
-	lock	sync.RWMutex
-	counts	map[string]*count
-	wake	*sync.Cond
+	lock   sync.RWMutex
+	counts map[string]*count
+	wake   *sync.Cond
 }
 
 type count struct {
-	vs	map[string]uint
+	vs map[string]uint
 }
 
-func (c *count)dead() bool {
+func (c *count) dead() bool {
 	return len(c.vs) == 0
 }
 
@@ -64,7 +64,7 @@ func MakeVCount() *VCount {
 	return vc
 }
 
-func (vc *VCount)Add(id, ver string) {
+func (vc *VCount) Add(id, ver string) {
 	vc.lock.Lock()
 	defer vc.lock.Unlock()
 
@@ -77,7 +77,7 @@ func (vc *VCount)Add(id, ver string) {
 	vc.wake.Broadcast()
 }
 
-func (vc *VCount)Del(id, ver string) {
+func (vc *VCount) Del(id, ver string) {
 	vc.lock.Lock()
 	defer vc.lock.Unlock()
 
@@ -100,7 +100,7 @@ func (vc *VCount)Del(id, ver string) {
 	vc.wake.Broadcast()
 }
 
-func (vc *VCount)List(id string) []string {
+func (vc *VCount) List(id string) []string {
 	var ret []string
 
 	vc.lock.RLock()
@@ -108,7 +108,7 @@ func (vc *VCount)List(id string) []string {
 
 	cm, ok := vc.counts[id]
 	if ok {
-		for v, _ := range cm.vs {
+		for v := range cm.vs {
 			ret = append(ret, v)
 		}
 	}
@@ -127,7 +127,7 @@ func over(vers map[string]uint, ver string) bool {
 	}
 
 	veri, _ := strconv.Atoi(ver)
-	for v, _ := range vers {
+	for v := range vers {
 		vi, _ := strconv.Atoi(v)
 		if vi > veri {
 			return true
@@ -142,12 +142,12 @@ func over(vers map[string]uint, ver string) bool {
  * is true, the second bool is undefined, so the former must be checked
  * first.
  */
-func (vc *VCount)Wait(id string, tmo time.Duration, vermatch string) (bool, bool) {
+func (vc *VCount) Wait(id string, tmo time.Duration, vermatch string) (bool, bool) {
 	timeout := false
 	timer := time.AfterFunc(tmo, func() {
-			timeout = true
-			vc.wake.Broadcast()
-		})
+		timeout = true
+		vc.wake.Broadcast()
+	})
 
 	vc.lock.RLock()
 	var gone bool

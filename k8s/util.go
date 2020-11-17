@@ -31,7 +31,7 @@ import (
 	"net"
 )
 
-func (pod *Pod)Ping() error {
+func (pod *Pod) Ping() error {
 	if pod.Addr == inmemPodAddr {
 		return nil
 	}

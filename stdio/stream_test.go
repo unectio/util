@@ -7,27 +7,26 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-package main
+package stdio
 
 import (
 	"fmt"
-	"time"
 	"testing"
-	"github.com/unectio/util/stdio"
+	"time"
 )
 
 func TestStream(t *testing.T) {
-	out, err := stdio.Make("out")
+	out, err := Make("out")
 	if err != nil {
 		fmt.Printf("error making stream: %s\n", err.Error())
 		t.FailNow()
 		return
 	}
 
-	tmo := time.AfterFunc(5 * time.Second, func() {
-					fmt.Printf("Timeout\n")
-					t.FailNow()
-				})
+	tmo := time.AfterFunc(5*time.Second, func() {
+		fmt.Printf("Timeout\n")
+		t.FailNow()
+	})
 
 	x := out.Read()
 	tmo.Stop()

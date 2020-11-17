@@ -7,34 +7,33 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-package main
+package util
 
 import (
 	"fmt"
-	"time"
 	"testing"
-	"github.com/unectio/util"
+	"time"
 )
 
 func TestPruneList(t *testing.T) {
-	pl := util.NewPruneList()
+	pl := NewPruneList()
 
 	/* Double sched */
-	pl.Schedule("1", "one", 3 * time.Second)
-	pl.Schedule("1", "one", 3 * time.Second)
+	pl.Schedule("1", "one", 3*time.Second)
+	pl.Schedule("1", "one", 3*time.Second)
 
 	/* Unsched */
-	pl.Schedule("2", "two", 10 * time.Second)
-	pl.Schedule("2", "two", 10 * time.Second)
+	pl.Schedule("2", "two", 10*time.Second)
+	pl.Schedule("2", "two", 10*time.Second)
 	pl.Unschedule("2")
 
 	/* Resched */
-	pl.Schedule("3", "three", 5 * time.Second)
+	pl.Schedule("3", "three", 5*time.Second)
 	pl.Unschedule("3")
-	pl.Schedule("3", "three", 5 * time.Second)
+	pl.Schedule("3", "three", 5*time.Second)
 
 	/* Schedule earlier */
-	pl.Schedule("4", "four", 2 * time.Second)
+	pl.Schedule("4", "four", 2*time.Second)
 
 	x := <-pl.Wait()
 	fmt.Printf("%s\n", x.(string))

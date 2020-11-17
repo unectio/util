@@ -28,11 +28,12 @@
 package mongo
 
 import (
-	"fmt"
-	"sync"
 	"errors"
+	"fmt"
 	"reflect"
 	"strings"
+	"sync"
+
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -42,8 +43,8 @@ const (
 )
 
 type MemDB struct {
-	lock	sync.RWMutex
-	cols	map[string]*MemCol
+	lock sync.RWMutex
+	cols map[string]*MemCol
 }
 
 func GetMemDB() Session {
@@ -52,14 +53,14 @@ func GetMemDB() Session {
 	}
 }
 
-func (_ *MemDB)Close() {
+func (_ *MemDB) Close() {
 }
 
-func (mdb *MemDB)Copy() Session {
+func (mdb *MemDB) Copy() Session {
 	return mdb
 }
 
-func (mdb *MemDB)Collection(loc *Location) Collection {
+func (mdb *MemDB) Collection(loc *Location) Collection {
 	mdb.lock.RLock()
 	defer mdb.lock.RUnlock()
 
@@ -74,8 +75,8 @@ func (mdb *MemDB)Collection(loc *Location) Collection {
 }
 
 type memObj struct {
-	m	map[string]interface{}
-	js	[]byte
+	m  map[string]interface{}
+	js []byte
 }
 
 func makeObj(o interface{}) (*memObj, error) {
@@ -97,15 +98,15 @@ func makeObj(o interface{}) (*memObj, error) {
 }
 
 type MemCol struct {
-	lock	sync.RWMutex
-	objs	[]*memObj
+	lock sync.RWMutex
+	objs []*memObj
 }
 
-func (mc *MemCol)Find(q bson.M) Query {
+func (mc *MemCol) Find(q bson.M) Query {
 	return newQ(q, mc)
 }
 
-func (mc *MemCol)Insert(o interface{}) error {
+func (mc *MemCol) Insert(o interface{}) error {
 	obj, err := makeObj(o)
 	if err != nil {
 		return err
@@ -118,13 +119,13 @@ func (mc *MemCol)Insert(o interface{}) error {
 	return nil
 }
 
-func (mc *MemCol)del(i int) {
+func (mc *MemCol) del(i int) {
 	l := len(mc.objs) - 1
 	mc.objs[i] = mc.objs[l]
 	mc.objs = mc.objs[:l]
 }
 
-func (mc *MemCol)RemoveId(id bson.ObjectId) error {
+func (mc *MemCol) RemoveId(id bson.ObjectId) error {
 	mc.lock.Lock()
 	defer mc.lock.Unlock()
 
@@ -138,7 +139,7 @@ func (mc *MemCol)RemoveId(id bson.ObjectId) error {
 	return notFound()
 }
 
-func (mc *MemCol)RemoveAll(q bson.M) error {
+func (mc *MemCol) RemoveAll(q bson.M) error {
 	mc.lock.Lock()
 	defer mc.lock.Unlock()
 
@@ -156,7 +157,7 @@ func (mc *MemCol)RemoveAll(q bson.M) error {
 	return nil
 }
 
-func (mc *MemCol)Update(q bson.M, u interface{}) error {
+func (mc *MemCol) Update(q bson.M, u interface{}) error {
 	mq := newQ(q, mc)
 	i, o := mq.find()
 	if i != -1 {
@@ -172,7 +173,7 @@ func (mc *MemCol)Update(q bson.M, u interface{}) error {
 	return notFound()
 }
 
-func (mc *MemCol)EnsureIndex(_ *mgo.Index) error {
+func (mc *MemCol) EnsureIndex(_ *mgo.Index) error {
 	return nil
 }
 
@@ -185,7 +186,7 @@ func updateObj(o *memObj, u interface{}) (*memObj, error) {
 	hasAct := false
 	hasPlain := false
 
-	for k, _ := range uo.m {
+	for k := range uo.m {
 		if k[0] == '$' {
 			if hasPlain {
 				return nil, errors.New("Mixed action/plain update")
@@ -262,38 +263,38 @@ func dupObj(o *memObj) *memObj {
 }
 
 type MemQ struct {
-	q	bson.M
-	mc	*MemCol
-	lim	int
+	q   bson.M
+	mc  *MemCol
+	lim int
 }
 
 func newQ(q bson.M, mc *MemCol) *MemQ {
 	return &MemQ{
-		q:	q,
-		mc:	mc,
-		lim:	maxLimit,
+		q:   q,
+		mc:  mc,
+		lim: maxLimit,
 	}
 }
 
-func (q *MemQ)Iter() Iter {
+func (q *MemQ) Iter() Iter {
 	return &MemIter{q, 0, nil}
 }
 
-func (q *MemQ)Limit(n int) Query {
+func (q *MemQ) Limit(n int) Query {
 	q.lim = n
 	return q
 }
 
-func (q *MemQ)Sort(f string) Query {
+func (q *MemQ) Sort(f string) Query {
 	/* Sorry :( */
 	return q
 }
 
-func (q *MemQ)Count() (int, error) {
+func (q *MemQ) Count() (int, error) {
 	return len(q.mc.objs), nil
 }
 
-func (q *MemQ)One(out interface{}) error {
+func (q *MemQ) One(out interface{}) error {
 	q.mc.lock.RLock()
 	defer q.mc.lock.RUnlock()
 
@@ -305,7 +306,7 @@ func (q *MemQ)One(out interface{}) error {
 	return copyObj(o, out)
 }
 
-func (q *MemQ)find() (int, *memObj) {
+func (q *MemQ) find() (int, *memObj) {
 	for i, o := range q.mc.objs {
 		if q.match(o) {
 			return i, o
@@ -331,14 +332,14 @@ func equalOid(a bson.ObjectId, b interface{}) bool {
 
 func equal(a interface{}, b interface{}) bool {
 	switch a := a.(type) {
-		case string:
-			return equalS(a, b)
-		case float64:
-			return equalI(int(a), b)
-		case int:
-			return equalI(a, b)
-		case bson.ObjectId:
-			return equalOid(a, b)
+	case string:
+		return equalS(a, b)
+	case float64:
+		return equalI(int(a), b)
+	case int:
+		return equalI(a, b)
+	case bson.ObjectId:
+		return equalOid(a, b)
 	}
 
 	fmt.Printf("unsupported type\n")
@@ -349,7 +350,6 @@ func setField(fname string, value interface{}, o *memObj) error {
 	path := strings.Split(fname, ".")
 	cur := o.m
 	l := len(path)
-
 
 	for i, n := range path {
 		if i == l-1 {
@@ -365,10 +365,10 @@ func setField(fname string, value interface{}, o *memObj) error {
 		}
 
 		switch xt := x.(type) {
-			case map[string]interface{}:
-				cur = xt
-			default:
-				return errors.New("field conflict")
+		case map[string]interface{}:
+			cur = xt
+		default:
+			return errors.New("field conflict")
 		}
 	}
 
@@ -380,7 +380,6 @@ func matchField(fname string, value interface{}, o *memObj) bool {
 	cur := o.m
 	l := len(path)
 
-
 	for i, n := range path {
 		x, ok := cur[n]
 		if !ok {
@@ -391,17 +390,17 @@ func matchField(fname string, value interface{}, o *memObj) bool {
 		}
 
 		switch xt := x.(type) {
-			case map[string]interface{}:
-				cur = xt
-			default:
-				return false
+		case map[string]interface{}:
+			cur = xt
+		default:
+			return false
 		}
 	}
 
 	return false
 }
 
-func (q *MemQ)match(o *memObj) bool {
+func (q *MemQ) match(o *memObj) bool {
 	for k, v := range q.q {
 		if !matchField(k, v, o) {
 			return false
@@ -412,20 +411,20 @@ func (q *MemQ)match(o *memObj) bool {
 }
 
 type MemIter struct {
-	q	*MemQ
-	i	int
-	er	error
+	q  *MemQ
+	i  int
+	er error
 }
 
-func (i *MemIter)Err() error {
+func (i *MemIter) Err() error {
 	return i.er
 }
 
-func (i *MemIter)Close() error {
+func (i *MemIter) Close() error {
 	return i.er
 }
 
-func (i *MemIter)Next(out interface{}) bool {
+func (i *MemIter) Next(out interface{}) bool {
 	q := i.q
 	if q.lim <= 0 {
 		return false

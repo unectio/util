@@ -28,32 +28,32 @@
 package workq
 
 import (
-	"sync"
 	"container/list"
+	"sync"
 )
 
 type Pool struct {
-	in	chan *request
-	queues	*list.List
-	lock	sync.Mutex
-	wake	*sync.Cond
+	in     chan *request
+	queues *list.List
+	lock   sync.Mutex
+	wake   *sync.Cond
 }
 
 type Worker struct {
-	stop	bool
-	p	*Pool
+	stop bool
+	p    *Pool
 }
 
 type queue struct {
-	key	string
-	reqs	[]*request
-	l	*list.Element
+	key  string
+	reqs []*request
+	l    *list.Element
 }
 
 type request struct {
-	key	string
-	fn	func(interface{})
-	done	chan bool
+	key  string
+	fn   func(interface{})
+	done chan bool
 }
 
 func Make() *Pool {
@@ -66,7 +66,7 @@ func Make() *Pool {
 	return ret
 }
 
-func (pool *Pool)queue(key string) *queue {
+func (pool *Pool) queue(key string) *queue {
 	for e := pool.queues.Front(); e != nil; e = e.Next() {
 		q := e.Value.(*queue)
 		if q.key == key {
@@ -77,7 +77,7 @@ func (pool *Pool)queue(key string) *queue {
 	return nil
 }
 
-func (pool *Pool)enqueue(rq *request) {
+func (pool *Pool) enqueue(rq *request) {
 	pool.lock.Lock()
 	defer func() {
 		pool.wake.Signal()
@@ -93,7 +93,7 @@ func (pool *Pool)enqueue(rq *request) {
 	}
 }
 
-func (w *Worker)next() *request {
+func (w *Worker) next() *request {
 	var x *list.Element
 
 	pool := w.p
@@ -124,7 +124,7 @@ func (w *Worker)next() *request {
 	return rq
 }
 
-func (w *Worker)work(wi interface{}) {
+func (w *Worker) work(wi interface{}) {
 	for {
 		rq := w.next()
 		if rq == nil {
@@ -135,19 +135,19 @@ func (w *Worker)work(wi interface{}) {
 	}
 }
 
-func (w *Worker)Stop() {
+func (w *Worker) Stop() {
 	w.stop = true
 	w.p.wake.Broadcast()
 }
 
-func (pool *Pool)AddWorker(wi interface{}) *Worker {
+func (pool *Pool) AddWorker(wi interface{}) *Worker {
 	w := &Worker{p: pool}
 	go w.work(wi)
 	return w
 }
 
-func (pool *Pool)Run(key string, f func(w interface{})) {
-	rq := &request{ key: key, fn: f, done: make(chan bool) }
+func (pool *Pool) Run(key string, f func(w interface{})) {
+	rq := &request{key: key, fn: f, done: make(chan bool)}
 	pool.enqueue(rq)
 	<-rq.done
 }

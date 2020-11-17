@@ -33,17 +33,17 @@ import (
 )
 
 type Filter struct {
-	rate	uint
-	burst	uint
-	base	time.Duration
+	rate  uint
+	burst uint
+	base  time.Duration
 
-	stock	uint
-	ts	time.Time
+	stock uint
+	ts    time.Time
 
-	lock	sync.Mutex
+	lock sync.Mutex
 }
 
-func (f *Filter)gain(d time.Duration) uint {
+func (f *Filter) gain(d time.Duration) uint {
 	/* One stock point is acquired for time.Second / rate time */
 	gain := uint(uint64(d) * uint64(f.rate) / uint64(f.base))
 	if gain > f.burst {
@@ -52,17 +52,17 @@ func (f *Filter)gain(d time.Duration) uint {
 	return gain
 }
 
-func (f *Filter)FullLocked() bool {
-	return f.stock >= f.burst || time.Now().Sub(f.ts) >= f.base
+func (f *Filter) FullLocked() bool {
+	return f.stock >= f.burst || time.Since(f.ts) >= f.base
 }
 
-func (f *Filter)Full() bool {
+func (f *Filter) Full() bool {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 	return f.FullLocked()
 }
 
-func (f *Filter)refill() bool {
+func (f *Filter) refill() bool {
 	now := time.Now()
 	d := now.Sub(f.ts)
 	if d >= f.base {
@@ -81,7 +81,7 @@ func (f *Filter)refill() bool {
 	return true
 }
 
-func (f *Filter)StepLocked() bool {
+func (f *Filter) StepLocked() bool {
 	if f.rate == 0 {
 		return true
 	}
@@ -94,27 +94,27 @@ func (f *Filter)StepLocked() bool {
 	return true
 }
 
-func (f *Filter)Step() bool {
+func (f *Filter) Step() bool {
 	f.lock.Lock()
 	ok := f.StepLocked()
 	f.lock.Unlock()
 	return ok
 }
 
-func (f *Filter)UndoLocked() {
+func (f *Filter) UndoLocked() {
 	if f.rate != 0 && f.stock < f.burst {
 		f.stock++
 	}
 }
 
-func (f *Filter)Undo() {
+func (f *Filter) Undo() {
 	f.lock.Lock()
 	f.UndoLocked()
 	f.lock.Unlock()
 }
 
-func (f *Filter)ResetLocked(rate, burst uint, base time.Duration) {
-	if f.rate != rate || f.burst != burst + 1 {
+func (f *Filter) ResetLocked(rate, burst uint, base time.Duration) {
+	if f.rate != rate || f.burst != burst+1 {
 		f.rate = rate
 		f.burst = burst + 1
 		f.base = base
@@ -124,7 +124,7 @@ func (f *Filter)ResetLocked(rate, burst uint, base time.Duration) {
 	}
 }
 
-func (f *Filter)Reset(rate, burst uint) {
+func (f *Filter) Reset(rate, burst uint) {
 	f.lock.Lock()
 	f.ResetLocked(rate, burst, f.base)
 	f.lock.Unlock()

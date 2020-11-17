@@ -7,14 +7,13 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-package main
+package rq
 
 import (
 	"fmt"
-	"time"
-	"testing"
 	"net/http"
-	"github.com/unectio/util/request"
+	"testing"
+	"time"
 )
 
 func server(w http.ResponseWriter, r *http.Request) {
@@ -34,13 +33,14 @@ func server(w http.ResponseWriter, r *http.Request) {
 
 func TestRestReq(t *testing.T) {
 	server := http.Server{
-		Handler:      http.HandlerFunc(server),
-		Addr:         "127.0.0.1:8888",
+		Handler: http.HandlerFunc(server),
+		Addr:    "127.0.0.1:8888",
 	}
 
-	go func() {
+	go func() { //nolint:staticcheck
 		err := server.ListenAndServe()
 		if err != nil {
+			// TODO: use http test server instead
 			t.Fatalf("err in server: %s", err.Error())
 		}
 	}()
@@ -48,7 +48,7 @@ func TestRestReq(t *testing.T) {
 	/* How else to wait for the server port open? */
 	time.Sleep(500 * time.Millisecond)
 
-	resp := rq.Req("http://127.0.0.1:8888", "/foo/bar?query=param").M("PATCH").OK(http.StatusGone).H("X-Test-Head", "yes").Do()
+	resp := Req("http://127.0.0.1:8888", "/foo/bar?query=param").M("PATCH").OK(http.StatusGone).H("X-Test-Head", "yes").Do()
 	if !resp.OK() {
 		t.Fatalf("err in req: %s", resp.Error())
 	}

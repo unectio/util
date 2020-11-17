@@ -28,33 +28,33 @@
 package seqpack
 
 import (
-	"os"
-	"io"
-	"fmt"
-	"time"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
+	"os"
 	"strconv"
 	"syscall"
-	"encoding/json"
+	"time"
 )
 
 const (
-	chunkSize	= 1024
-	preallocSize	= 4096
+	chunkSize    = 1024
+	preallocSize = 4096
 )
 
 var ErrTimeout = errors.New("IO Timeout")
 
 type Socket struct {
-	f	*os.File
-	peer_fd	int
+	f       *os.File
+	peer_fd int
 }
 
 func id2fd(id string) (int, error) { return strconv.Atoi(id) }
-func fd2id(fd int) string { return strconv.Itoa(fd) }
+func fd2id(fd int) string          { return strconv.Itoa(fd) }
 
-func makeSocket(fd, peer int) (*Socket) {
-	return &Socket{ f: os.NewFile(uintptr(fd), "seqsk"), peer_fd: peer }
+func makeSocket(fd, peer int) *Socket {
+	return &Socket{f: os.NewFile(uintptr(fd), "seqsk"), peer_fd: peer}
 }
 
 func Make() (*Socket, error) {
@@ -77,23 +77,23 @@ func Open(id string) (*Socket, error) {
 	return makeSocket(fd, -1), nil
 }
 
-func (sk *Socket)ClosePeer() {
+func (sk *Socket) ClosePeer() {
 	if sk.peer_fd != -1 {
 		syscall.Close(sk.peer_fd)
 		sk.peer_fd = -1
 	}
 }
 
-func (sk *Socket)PFd() string {
+func (sk *Socket) PFd() string {
 	return fd2id(sk.peer_fd)
 }
 
-func (sk *Socket)Close() {
+func (sk *Socket) Close() {
 	sk.ClosePeer()
 	sk.f.Close()
 }
 
-func (sk *Socket)SetTimeout(tmo time.Duration) error {
+func (sk *Socket) SetTimeout(tmo time.Duration) error {
 	tv := syscall.NsecToTimeval(tmo.Nanoseconds())
 	return syscall.SetsockoptTimeval(int(sk.f.Fd()), syscall.SOL_SOCKET, syscall.SO_RCVTIMEO, &tv)
 }
@@ -105,7 +105,7 @@ func (sk *Socket)SetTimeout(tmo time.Duration) error {
  * request ends we make the data not chunkSize aliquot
  */
 
-func (sk *Socket)RecvRaw() ([]byte, error) {
+func (sk *Socket) RecvRaw() ([]byte, error) {
 	ch := make([]byte, chunkSize)
 	data := make([]byte, 0, preallocSize)
 
@@ -134,8 +134,8 @@ func (sk *Socket)RecvRaw() ([]byte, error) {
 	}
 }
 
-func (sk *Socket)SendRaw(data []byte) error {
-	if len(data) % chunkSize == 0 {
+func (sk *Socket) SendRaw(data []byte) error {
+	if len(data)%chunkSize == 0 {
 		data = append(data, byte(0))
 	}
 
@@ -147,7 +147,7 @@ func (sk *Socket)SendRaw(data []byte) error {
 	return nil
 }
 
-func (sk *Socket)Recv(o interface{}) error {
+func (sk *Socket) Recv(o interface{}) error {
 	data, err := sk.RecvRaw()
 	if err != nil {
 		return err
@@ -161,7 +161,7 @@ func (sk *Socket)Recv(o interface{}) error {
 	return nil
 }
 
-func (sk *Socket)Send(o interface{}) error {
+func (sk *Socket) Send(o interface{}) error {
 	b, err := json.Marshal(o)
 	if err != nil {
 		return fmt.Errorf("marshal error: %s", err.Error())

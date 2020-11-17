@@ -7,26 +7,29 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-package main
+package seqpack
 
 import (
 	"fmt"
+	"runtime"
 	"testing"
-	"github.com/unectio/util/seqpack"
 )
 
 type Foo struct {
-	Bar	int
+	Bar int
 }
 
 func TestSeqPack(t *testing.T) {
-	sk, err := seqpack.Make()
+	if runtime.GOOS != "linux" {
+		t.Skip("This test can be reproduce on Linux platform")
+	}
+	sk, err := Make()
 	if err != nil {
 		t.Fatalf("Cannot make socket: %s", err.Error())
 	}
 
-	go func() {
-		psk, err := seqpack.Open(sk.PFd())
+	go func() { //nolint:staticcheck
+		psk, err := Open(sk.PFd())
 		if err != nil {
 			t.Fatalf("Cannot open peer sk: %s", err.Error())
 		}
@@ -45,7 +48,7 @@ func TestSeqPack(t *testing.T) {
 		}
 	}()
 
-	err = sk.Send(map[string]string{"foo":"bar"})
+	err = sk.Send(map[string]string{"foo": "bar"})
 	if err != nil {
 		t.Fatalf("Cannot send map: %s", err.Error())
 	}

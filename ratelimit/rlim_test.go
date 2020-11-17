@@ -7,22 +7,21 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-package main
+package ratelimit
 
 import (
 	"fmt"
-	"time"
 	"testing"
-	"github.com/unectio/util/ratelimit"
+	"time"
 )
 
 var (
 	burst uint = 10
-	rate uint = 5
+	rate  uint = 5
 )
 
 func TestRatelimit(t *testing.T) {
-	rl := ratelimit.NewFilter(burst, rate)
+	rl := NewFilter(burst, rate)
 
 	stop := time.Now().Add(time.Second)
 	events := uint(0)
@@ -38,7 +37,7 @@ func TestRatelimit(t *testing.T) {
 
 	exp := burst + rate
 	fmt.Printf("%d/%d events\n", events, exp)
-	if events > 2 * exp {
+	if events > 2*exp {
 		t.Fail()
 	}
 }
