@@ -31,8 +31,12 @@ import (
 	"net"
 )
 
+const (
+	InmemPodAddr = "in.mem.pod.addr"
+)
+
 func (pod *Pod) Ping() error {
-	if pod.Addr == inmemPodAddr {
+	if pod.Addr == InmemPodAddr {
 		return nil
 	}
 

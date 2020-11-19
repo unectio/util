@@ -28,37 +28,35 @@
 package k8s
 
 import (
+	"context"
 	"errors"
 	"sync"
 
-	"k8s.io/api/apps/v1beta1"
-	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
-)
-
-const (
-	inmemPodAddr = "in.mem.pod.addr"
+	"github.com/unectio/util/k8s"
+	v1 "k8s.io/api/apps/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type ievent struct {
-	pod *Pod
+	pod *k8s.Pod
 	up  bool
 }
 
 type KubeOSet struct {
 	deps   sync.Map
 	evs    chan *ievent
-	notify func(*Pod, bool)
+	notify func(*k8s.Pod, bool)
 }
 
-func (k *KubeOSet) Deps() DepAPI { return k }
+func (k *KubeOSet) Deps() k8s.DepAPI { return k }
 
-func (k *KubeOSet) Notify(h *EventHandlers, data interface{}) {
-	k.notify = func(pod *Pod, up bool) {
+func (k *KubeOSet) Notify(h *k8s.EventHandlers, data interface{}) {
+	k.notify = func(pod *k8s.Pod, up bool) {
 		h.PodLifecycle(pod, up, data)
 	}
 }
 
-func KubeInMem() Client {
+func KubeInMem() k8s.Client {
 	ret := &KubeOSet{}
 	ret.evs = make(chan *ievent)
 	go func() {
@@ -71,33 +69,33 @@ func KubeInMem() Client {
 	return ret
 }
 
-func (k *KubeOSet) Create(spec *v1beta1.Deployment) (*v1beta1.Deployment, error) {
+func (k *KubeOSet) Create(ctx context.Context, spec *v1.Deployment, opts metaV1.CreateOptions) (*v1.Deployment, error) {
 	n := spec.ObjectMeta.Name
 	k.deps.Store(n, spec)
 	go func() {
-		p := &Pod{UID: "0"}
-		p.Addr = inmemPodAddr
-		p.scanEnv(spec.Spec.Template.Spec.Containers[0].Env)
+		p := &k8s.Pod{UID: "0"}
+		p.Addr = k8s.InmemPodAddr
+		p.ScanEnv(spec.Spec.Template.Spec.Containers[0].Env)
 		k.evs <- &ievent{pod: p, up: true}
 	}()
 	return spec, nil
 }
 
-func (k *KubeOSet) Delete(name string, ops *meta.DeleteOptions) error {
+func (k *KubeOSet) Delete(ctx context.Context, name string, ops metaV1.DeleteOptions) error {
 	k.deps.Delete(name)
 	return nil
 }
 
-func (k *KubeOSet) Get(name string, ops meta.GetOptions) (*v1beta1.Deployment, error) {
+func (k *KubeOSet) Get(ctx context.Context, name string, ops metaV1.GetOptions) (*v1.Deployment, error) {
 	x, ok := k.deps.Load(name)
 	if !ok {
 		return nil, errors.New("not found")
 	}
 
-	return x.(*v1beta1.Deployment), nil
+	return x.(*v1.Deployment), nil
 }
 
-func (k *KubeOSet) Update(spec *v1beta1.Deployment) (*v1beta1.Deployment, error) {
+func (k *KubeOSet) Update(ctx context.Context, spec *v1.Deployment, opts metaV1.UpdateOptions) (*v1.Deployment, error) {
 	n := spec.ObjectMeta.Name
 	k.deps.Store(n, spec)
 	return spec, nil

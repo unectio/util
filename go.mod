@@ -3,6 +3,7 @@ module github.com/unectio/util
 go 1.15
 
 require (
+	github.com/Azure/go-autorest v11.1.2+incompatible // indirect
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/groupcache v0.0.0-20191227052852-215e87163ea7 // indirect
 	github.com/golang/protobuf v1.4.2 // indirect
@@ -23,9 +24,9 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
 	gopkg.in/yaml.v2 v2.3.0
-	k8s.io/api v0.0.0-20190620084959-7cf5895f2711
-	k8s.io/apimachinery v0.0.0-20190612205821-1799e75a0719
-	k8s.io/client-go v0.0.0-20190620085101-78d2af792bab
+	k8s.io/api v0.18.0
+	k8s.io/apimachinery v0.18.0
+	k8s.io/client-go v0.18.0
 	k8s.io/klog v1.0.0 // indirect
 	k8s.io/klog/v2 v2.2.0 // indirect
 	k8s.io/utils v0.0.0-20200912215256-4140de9c8800 // indirect

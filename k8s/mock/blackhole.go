@@ -28,31 +28,34 @@
 package k8s
 
 import (
+	"context"
 	"errors"
 
-	"k8s.io/api/apps/v1beta1"
-	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/api/apps/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/unectio/util/k8s"
 )
 
 type BlackHole struct{}
 
 var bhError = errors.New("BlackHole kuber")
 
-func (bh *BlackHole) Deps() DepAPI                           { return bh }
-func (bh *BlackHole) Notify(_ *EventHandlers, _ interface{}) {}
+func (bh *BlackHole) Deps() k8s.DepAPI                           { return bh }
+func (bh *BlackHole) Notify(_ *k8s.EventHandlers, _ interface{}) {}
 
-func (_ *BlackHole) Create(_ *v1beta1.Deployment) (*v1beta1.Deployment, error) {
+func (_ *BlackHole) Create(_ context.Context, _ *v1.Deployment, _ metaV1.CreateOptions) (*v1.Deployment, error) {
 	return nil, bhError
 }
 
-func (_ *BlackHole) Get(_ string, _ meta.GetOptions) (*v1beta1.Deployment, error) {
+func (_ *BlackHole) Get(_ context.Context, _ string, _ metaV1.GetOptions) (*v1.Deployment, error) {
 	return nil, bhError
 }
 
-func (_ *BlackHole) Update(_ *v1beta1.Deployment) (*v1beta1.Deployment, error) {
+func (_ *BlackHole) Update(_ context.Context, _ *v1.Deployment, _ metaV1.UpdateOptions) (*v1.Deployment, error) {
 	return nil, bhError
 }
 
-func (_ *BlackHole) Delete(_ string, _ *meta.DeleteOptions) error {
+func (_ *BlackHole) Delete(_ context.Context, _ string, _ metaV1.DeleteOptions) error {
 	return nil
 }

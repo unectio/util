@@ -61,7 +61,7 @@ const (
 	LabelHelper = "helper"
 )
 
-func (p *Pod) scanEnv(env []v1.EnvVar) {
+func (p *Pod) ScanEnv(env []v1.EnvVar) {
 	for _, v := range env {
 		switch v.Name {
 		case api.EnvPort:
@@ -96,7 +96,7 @@ func toPod(pod *v1.Pod) (*Pod, error) {
 	}
 
 	for _, c := range pod.Spec.Containers {
-		p.scanEnv(c.Env)
+		p.ScanEnv(c.Env)
 	}
 
 	if p.Helper != "" && p.Helper != p.lang {

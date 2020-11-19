@@ -28,12 +28,13 @@
 package k8s
 
 import (
+	"context"
 	"encoding/base64"
 	"errors"
 
 	"github.com/unectio/util"
-	"k8s.io/api/apps/v1beta1"
-	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/api/apps/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
@@ -43,10 +44,10 @@ const (
 )
 
 type DepAPI interface {
-	Create(*v1beta1.Deployment) (*v1beta1.Deployment, error)
-	Get(string, meta.GetOptions) (*v1beta1.Deployment, error)
-	Update(*v1beta1.Deployment) (*v1beta1.Deployment, error)
-	Delete(string, *meta.DeleteOptions) error
+	Create(ctx context.Context, deployment *v1.Deployment, opts metaV1.CreateOptions) (*v1.Deployment, error)
+	Get(ctx context.Context, name string, opts metaV1.GetOptions) (*v1.Deployment, error)
+	Update(ctx context.Context, deployment *v1.Deployment, opts metaV1.UpdateOptions) (*v1.Deployment, error)
+	Delete(ctx context.Context, name string, opts metaV1.DeleteOptions) error
 }
 
 type Client interface {
@@ -60,7 +61,7 @@ type KubeNsClient struct {
 }
 
 func (kc *KubeNsClient) Deps() DepAPI {
-	return kc.c.AppsV1beta1().Deployments(kc.ns)
+	return kc.c.AppsV1().Deployments(kc.ns)
 }
 
 type SaConfig struct {
